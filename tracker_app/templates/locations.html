@@ -4,23 +4,52 @@
     <main role="main" class="container text-center">
         <br><br>
         <h3>Your locations:</h3>
-        <br><br>
+        <br>
         <div class="row justify-content-center">
             <div class="col-lg-6">
                 <div class="content-section">
-
-                    <p>You have currently 0 locations added.</p><br>
-
+                    {% if number_of_locations == 1 %}
+                        <p>You have currently 1 location added.</p><br>
+                    {% else %}
+                        <p>You have currently {{ number_of_locations }} locations added.</p><br>
+                    {% endif %}
+                    <br>
                     <a href="{{ url_for('tracker.add_location') }}">
                     <button type="submit" class="btn btn-primary">
                         Find a Location
                     </button> </a>
+                    <br><br><br><br>
 
                 </div>
             </div>
         </div>
     </main>
-
+    {% if number_of_locations > 0 %}
+        <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                  <th>#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Address</th>
+                  <th scope="col">Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for location in data %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <th>{{ location[2] }}</th>
+                        <th>{{ location[3] }}</th>
+                        <th>{{ location[4] }}</th>
+                        <th><a href="">Delete</a></th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    {% endif %}
 
 {% endblock content %}
 {% include "footer.html" %}

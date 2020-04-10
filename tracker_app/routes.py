@@ -7,7 +7,7 @@ import google.oauth2.credentials
 import googleapiclient.discovery
 from tracker_app.user_manager import check_if_user_exists, create_user, get_user_data, change_name
 from tracker_app.forms import UpdateUserSettings, NewLocation
-from tracker_app.location_manager import get_address_from_coordinates
+from tracker_app.location_manager import get_address_from_coordinates, add_location_to_db, get_locations_from_db
 
 
 tracker = Blueprint("tracker", __name__)
@@ -56,7 +56,10 @@ def locations():
         user_info = get_user_info()
 
         if check_if_user_exists(user_info['email']):
-            return render_template("locations.html", title="Locations", logged_in=True)
+            data = get_locations_from_db(user_info['email'])
+            number_of_locations = len(data)
+            return render_template("locations.html", title="Locations", logged_in=True,
+                                   number_of_locations=number_of_locations, data=data)
 
     flash("Unable to access the location page without being logged in!", "danger")
     return redirect(url_for("tracker.home"))
@@ -82,7 +85,8 @@ def confirm_add_location(lat, lng):
             form = NewLocation()
             address = get_address_from_coordinates(lat, lng)
             if form.validate_on_submit():
-                print("Submitted")
+                add_location_to_db(user_info['email'], form.name.data, address, form.description.data, lat, lng)
+                return redirect(url_for("tracker.locations"))
             return render_template("confirm_location.html", title="Confirm Location", logged_in=True,
                                    address=address, form=form)
 

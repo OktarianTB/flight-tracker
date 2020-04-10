@@ -3,7 +3,12 @@
 
     <main role="main" class="container text-center">
         <br><br>
-        <h3>Do you want to add this location to your list?</h3>
+        <h3>Do you want to add this location to your list?</h3><br>
+        <a href="{{ url_for('tracker.add_location') }}">
+            <button type="submit" class="btn btn-primary">
+                Cancel
+            </button>
+        </a>
         <br><br>
 
         <div class="row justify-content-center">
