@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
@@ -22,6 +21,36 @@
         margin: 0;
         padding: 0;
       }
+    .controls {
+    background-color: #fff;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+    height: 29px;
+    margin-left: 17px;
+    margin-top: 10px;
+    outline: none;
+    padding: 0 11px 0 13px;
+    text-overflow: ellipsis;
+    width: 400px;
+    }
+
+    .controls:focus {
+    border-color: #4d90fe;
+    }
+    .title {
+    font-weight: bold;
+    }
+    #infowindow-content {
+    display: none;
+    }
+    #map #infowindow-content {
+    display: inline;
+    }
     </style>
 
     <title>
@@ -42,7 +71,7 @@
 
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-static-top" id="mainNav">
         <div class="container">
-          <a class="navbar-brand js-scroll-trigger" href="">Okto's Travel Tracker</a>
+          <a class="navbar-brand js-scroll-trigger" href="{{ url_for('tracker.home') }}">Okto's Travel Tracker</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -51,10 +80,10 @@
 
                 {% if logged_in %}
                 <li class="nav-item">
-                    <a class="nav-link js-scroll-trigger" href="">Profile</a>
+                    <a class="nav-link js-scroll-trigger" href="{{ url_for("tracker.home") }}">Profile</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link js-scroll-trigger" href="">Locations</a>
+                    <a class="nav-link js-scroll-trigger" href="{{ url_for("tracker.locations") }}">Locations</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link js-scroll-trigger" href="">Flights</a>
@@ -64,7 +93,7 @@
                       Account
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Settings</a>
+                          <a class="dropdown-item" href="{{ url_for('tracker.settings') }}">Settings</a>
                           <a class="dropdown-item" href="{{ url_for('tracker.logout') }}">Log Out</a>
                     </div>
                 </li>

@@ -1,0 +1,26 @@
+{% include "header.html" %}
+{% block content %}
+
+    <main role="main" class="container text-center">
+        <br><br>
+        <h3>Your locations:</h3>
+        <br><br>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="content-section">
+
+                    <p>You have currently 0 locations added.</p><br>
+
+                    <a href="{{ url_for('tracker.add_location') }}">
+                    <button type="submit" class="btn btn-primary">
+                        Find a Location
+                    </button> </a>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+{% endblock content %}
+{% include "footer.html" %}

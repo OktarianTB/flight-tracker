@@ -1,11 +1,13 @@
 import flask
 from flask import Blueprint, render_template, redirect, url_for, flash, make_response, request
-from flask_login import login_user, current_user, logout_user, login_required
 from tracker_app.config import Config
 import functools
 from authlib.integrations.requests_client import OAuth2Session
 import google.oauth2.credentials
 import googleapiclient.discovery
+from tracker_app.user_manager import check_if_user_exists, create_user, get_user_data, change_name
+from tracker_app.forms import UpdateUserSettings, NewLocation
+from tracker_app.location_manager import get_address_from_coordinates
 
 
 tracker = Blueprint("tracker", __name__)
@@ -15,11 +17,77 @@ tracker = Blueprint("tracker", __name__)
 def home():
     if is_logged_in():
         user_info = get_user_info()
+        if check_if_user_exists(user_info['email']) is False:
+            create_user(user_info['email'], user_info['given_name'])
+
         return render_template("home.html", title="Home", api_key=Config.API_KEY,
                                name=user_info['given_name'], email=user_info['email'], logged_in=True)
 
     flash("You need to login!", "info")
     return render_template("home.html", title="Home", logged_in=False)
+
+
+@tracker.route("/settings", methods=["GET", "POST"])
+def settings():
+    if is_logged_in():
+        user_info = get_user_info()
+        if check_if_user_exists(user_info['email']):
+            data = get_user_data(user_info['email'])
+
+            form = UpdateUserSettings()
+            form.username.data = data["name"]
+            if form.validate_on_submit():
+                if form.username.raw_data[0] != data["name"]:
+                    change_name(data["email"], form.username.raw_data[0])
+                else:
+                    flash("You haven't made any changes to your settings.", "info")
+                return redirect(url_for("tracker.settings"))
+
+            return render_template("settings.html", title="Settings", logged_in=True, form=form,
+                                   email=data["email"], name=data["name"], color=data["color"])
+
+    flash("Unable to access settings without being logged in!", "danger")
+    return redirect(url_for("tracker.home"))
+
+
+@tracker.route("/locations", methods=["GET", "POST"])
+def locations():
+    if is_logged_in():
+        user_info = get_user_info()
+
+        if check_if_user_exists(user_info['email']):
+            return render_template("locations.html", title="Locations", logged_in=True)
+
+    flash("Unable to access the location page without being logged in!", "danger")
+    return redirect(url_for("tracker.home"))
+
+
+@tracker.route("/locations/add", methods=["GET", "POST"])
+def add_location():
+    if is_logged_in():
+        user_info = get_user_info()
+
+        if check_if_user_exists(user_info['email']):
+            return render_template("add_location.html", title="Add Location", logged_in=True, api_key=Config.API_KEY)
+
+    flash("Unable to access the location page without being logged in!", "danger")
+    return redirect(url_for("tracker.home"))
+
+
+@tracker.route("/locations/confirm/<lat>/<lng>", methods=["GET", "POST"])
+def confirm_add_location(lat, lng):
+    if is_logged_in():
+        user_info = get_user_info()
+        if check_if_user_exists(user_info['email']):
+            form = NewLocation()
+            address = get_address_from_coordinates(lat, lng)
+            if form.validate_on_submit():
+                print("Submitted")
+            return render_template("confirm_location.html", title="Confirm Location", logged_in=True,
+                                   address=address, form=form)
+
+    flash("Unable to access the location page without being logged in!", "danger")
+    return redirect(url_for("tracker.home"))
 
 
 def is_logged_in():

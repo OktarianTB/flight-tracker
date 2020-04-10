@@ -16,3 +16,5 @@ class Config:
 
     AUTH_TOKEN_KEY = 'auth_token'
     AUTH_STATE_KEY = 'auth_state'
+
+    DATABASE_PW = os.environ.get("TRAVEL_TRACKER_DATABASE_PW")
