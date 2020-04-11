@@ -5,31 +5,40 @@
 
         <div id="map"></div>
         <script>
-          var map;
-          function initMap() {
+            var map;
+            var coordinates = [];
 
-            map = new google.maps.Map(document.getElementById('map'), {
-              center: {lat: 40, lng: 0},
-              zoom: 2
-            });
+            function addCoordinates(lat, lng){
+                coordinates.push([lat, lng]);
+            }
 
-            var toulouse = {lat: 43.6047, lng:1.4442};
-            var hk = {lat: 22.3193, lng: 114.1694};
+            function initMap(){
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat: 40, lng: 0},
+                    zoom: 2
+                });
 
-            var flightPath = new google.maps.Polyline({
-                path: [toulouse, hk],
-                geodesic: true,
-                strokeColor: '#FF0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 2
-            });
-            flightPath.setMap(map);
+                function addMarker(location) {
+                    var marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                    });
+                }
 
-            var marker1 = new google.maps.Marker({position: toulouse, map: map, title: 'Toulouse'});
-            var marker2 = new google.maps.Marker({position: hk, map: map, title: 'Hong Kong'});
-          }
+                for(var i=0; i < coordinates.length; i++)
+                {
+                    addMarker({lat: coordinates[i][0], lng: coordinates[i][1]});
+                }
+        }
+
+
         </script>
 
+        {% for location in coordinates %}
+            <script type="text/javascript">
+                addCoordinates({{ location[0] }}, {{ location[1] }});
+            </script>
+        {% endfor %}
     {% endif %}
 
 

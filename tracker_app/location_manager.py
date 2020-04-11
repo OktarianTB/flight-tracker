@@ -37,3 +37,11 @@ def get_locations_from_db(email):
     cursor.execute(f"SELECT * FROM locations WHERE user_email='{email}'")
     result = cursor.fetchall()
     return result
+
+
+def extract_coordinates_from_data(data):
+    coordinates = []
+    for location in data:
+        coordinates.append([float(location[5]), float(location[6])])
+
+    return coordinates

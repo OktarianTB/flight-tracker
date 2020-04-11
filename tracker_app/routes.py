@@ -7,7 +7,8 @@ import google.oauth2.credentials
 import googleapiclient.discovery
 from tracker_app.user_manager import check_if_user_exists, create_user, get_user_data, change_name
 from tracker_app.forms import UpdateUserSettings, NewLocation
-from tracker_app.location_manager import get_address_from_coordinates, add_location_to_db, get_locations_from_db
+from tracker_app.location_manager import get_address_from_coordinates, add_location_to_db, get_locations_from_db, \
+    extract_coordinates_from_data
 
 
 tracker = Blueprint("tracker", __name__)
@@ -20,7 +21,9 @@ def home():
         if check_if_user_exists(user_info['email']) is False:
             create_user(user_info['email'], user_info['given_name'])
 
-        return render_template("home.html", title="Home", api_key=Config.API_KEY,
+        data = get_locations_from_db(user_info['email'])
+        coordinates = extract_coordinates_from_data(data)
+        return render_template("home.html", title="Home", api_key=Config.API_KEY, coordinates=coordinates,
                                name=user_info['given_name'], email=user_info['email'], logged_in=True)
 
     flash("You need to login!", "info")
