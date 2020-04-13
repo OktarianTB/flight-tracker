@@ -10,5 +10,5 @@ class UpdateUserSettings(FlaskForm):
 
 class NewLocation(FlaskForm):
     name = StringField("Your Location Name", validators=[DataRequired(), Length(min=3, max=35)])
-    description = TextAreaField(" Your Description", validators=[Length(min=0, max=200)])
+    description = TextAreaField(" Your Description", validators=[Length(min=0, max=100)])
     submit = SubmitField("Add Location")

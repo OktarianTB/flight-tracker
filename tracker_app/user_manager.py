@@ -19,25 +19,28 @@ def check_if_user_exists(email):
 
 def create_user(email, name):
     cursor = my_db.cursor()
-    sql = f"INSERT INTO users (email, username) VALUES ('{email}', '{name}')"
-    cursor.execute(sql)
+    data = (email, name)
+    sql = f"INSERT INTO users (email, username) VALUES (%s, %s)"
+    cursor.execute(sql, data)
     my_db.commit()
     print("User created with email:", email)
 
 
 def get_user_data(email):
     cursor = my_db.cursor()
-    cursor.execute(f"SELECT * FROM users WHERE email='{email}'")
+    data = (email, )
+    sql = f"SELECT * FROM users WHERE email=%s"
+    cursor.execute(sql, data)
     result = cursor.fetchall()[0]
     return {"email": result[0], "name": result[1], "date": result[2], "color": result[3]}
 
 
 def change_name(email, name):
     cursor = my_db.cursor()
-    sql = f"UPDATE users SET username='{name}' WHERE email='{email}'"
-    cursor.execute(sql)
+    data = (name, email)
+    sql = f"UPDATE users SET username=%s WHERE email=%s"
+    cursor.execute(sql, data)
     my_db.commit()
-    print("User with email:", email, "has updated his name to", name)
 
 
 

@@ -8,7 +8,7 @@ import googleapiclient.discovery
 from tracker_app.user_manager import check_if_user_exists, create_user, get_user_data, change_name
 from tracker_app.forms import UpdateUserSettings, NewLocation
 from tracker_app.location_manager import get_address_from_coordinates, add_location_to_db, get_locations_from_db, \
-    extract_coordinates_from_data
+    extract_coordinates_from_data, delete_location_from_db, check_id_belongs_to_user
 
 
 tracker = Blueprint("tracker", __name__)
@@ -95,6 +95,17 @@ def confirm_add_location(lat, lng):
 
     flash("Unable to access the location page without being logged in!", "danger")
     return redirect(url_for("tracker.home"))
+
+
+@tracker.route("/locations/delete/<location_id>", methods=["GET", "POST"])
+def delete_location(location_id):
+    if is_logged_in():
+        user_info = get_user_info()
+        if check_id_belongs_to_user(user_info['email'], location_id):
+            delete_location_from_db(location_id)
+        else:
+            flash("This location's ID is invalid.", "danger")
+    return redirect(url_for("tracker.locations"))
 
 
 def is_logged_in():

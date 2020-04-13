@@ -42,8 +42,8 @@
                         <th scope="row">{{ loop.index }}</th>
                         <th>{{ location[2] }}</th>
                         <th>{{ location[3] }}</th>
-                        <th>{{ location[4] }}</th>
-                        <th><a href="">Delete</a></th>
+                        <th>{{ location[4][:30] }}...</th>
+                        <th><a href="{{ url_for("tracker.delete_location", location_id=location[0]) }}">Delete</a></th>
                     </tr>
                 {% endfor %}
             </tbody>

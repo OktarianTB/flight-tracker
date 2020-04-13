@@ -23,18 +23,23 @@ def get_address_from_coordinates(lat, lng):
 def add_location_to_db(email, name, address, description, lat, lng):
     cursor = my_db.cursor()
     if len(description) == 0:
-        sql = f"INSERT INTO locations (user_email, name, address, lat, lng) VALUES ('{email}', '{name}', " \
-              f"'{address[:250]}', '{lat}', '{lng}')"
+        data = (email, name, address[:200], lat, lng)
+        sql = f"INSERT INTO locations (user_email, name, address, lat, lng) VALUES (%s, %s, " \
+              f"%s, %s, %s)"
+        cursor.execute(sql, data)
     else:
-        sql = f"INSERT INTO locations (user_email, name, address, description, lat, lng) VALUES ('{email}', '{name}', '{address[:250]}', " \
-              f"'{description}', '{lat}', '{lng}')"
-    cursor.execute(sql)
+        data = (email, name, address[:200], description[:200], lat, lng)
+        sql = f"INSERT INTO locations (user_email, name, address, description, lat, lng) VALUES (%s, %s, " \
+              f"%s, %s, %s, %s)"
+        cursor.execute(sql, data)
     my_db.commit()
 
 
 def get_locations_from_db(email):
     cursor = my_db.cursor()
-    cursor.execute(f"SELECT * FROM locations WHERE user_email='{email}'")
+    data = (email, )
+    sql = f"SELECT * FROM locations WHERE user_email=%s"
+    cursor.execute(sql, data)
     result = cursor.fetchall()
     return result
 
@@ -45,3 +50,22 @@ def extract_coordinates_from_data(data):
         coordinates.append([float(location[5]), float(location[6])])
 
     return coordinates
+
+
+def delete_location_from_db(location_id):
+    cursor = my_db.cursor()
+    data = (location_id, )
+    sql = f"DELETE FROM locations WHERE id=%s"
+    cursor.execute(sql, data)
+    my_db.commit()
+
+
+def check_id_belongs_to_user(email, location_id):
+    cursor = my_db.cursor()
+    data = (email, location_id)
+    sql = f"SELECT * FROM locations WHERE user_email=%s AND id=%s"
+    cursor.execute(sql, data)
+    result = cursor.fetchall()
+    if len(result) == 0:
+        return False
+    return True
