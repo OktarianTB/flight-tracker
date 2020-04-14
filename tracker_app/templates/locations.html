@@ -9,9 +9,9 @@
             <div class="col-lg-6">
                 <div class="content-section">
                     {% if number_of_locations == 1 %}
-                        <p>You have currently 1 location added.</p><br>
+                        <p>You currently have 1 location added.</p><br>
                     {% else %}
-                        <p>You have currently {{ number_of_locations }} locations added.</p><br>
+                        <p>You currently have {{ number_of_locations }} locations added.</p><br>
                     {% endif %}
                     <br>
                     <a href="{{ url_for('tracker.add_location') }}">

@@ -88,7 +88,8 @@ def confirm_add_location(lat, lng):
             form = NewLocation()
             address = get_address_from_coordinates(lat, lng)
             if form.validate_on_submit():
-                add_location_to_db(user_info['email'], form.name.data, address, form.description.data, lat, lng)
+                add_location_to_db(user_info['email'], form.name.data, address, form.description.data,
+                                   lat, lng, form.pin_color.data)
                 return redirect(url_for("tracker.locations"))
             return render_template("confirm_location.html", title="Confirm Location", logged_in=True,
                                    address=address, form=form)

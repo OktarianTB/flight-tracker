@@ -20,17 +20,17 @@ def get_address_from_coordinates(lat, lng):
     return redirect(url_for("tracker.home"))
 
 
-def add_location_to_db(email, name, address, description, lat, lng):
+def add_location_to_db(email, name, address, description, lat, lng, pin_color):
     cursor = my_db.cursor()
     if len(description) == 0:
-        data = (email, name, address[:200], lat, lng)
-        sql = f"INSERT INTO locations (user_email, name, address, lat, lng) VALUES (%s, %s, " \
-              f"%s, %s, %s)"
+        data = (email, name, address[:200], lat, lng, pin_color)
+        sql = f"INSERT INTO locations (user_email, name, address, lat, lng, color) VALUES (%s, %s, " \
+              f"%s, %s, %s, %s)"
         cursor.execute(sql, data)
     else:
-        data = (email, name, address[:200], description[:200], lat, lng)
-        sql = f"INSERT INTO locations (user_email, name, address, description, lat, lng) VALUES (%s, %s, " \
-              f"%s, %s, %s, %s)"
+        data = (email, name, address[:200], description[:200], lat, lng, pin_color)
+        sql = f"INSERT INTO locations (user_email, name, address, description, lat, lng, color) VALUES (%s, %s, " \
+              f"%s, %s, %s, %s, %s)"
         cursor.execute(sql, data)
     my_db.commit()
 
@@ -47,8 +47,7 @@ def get_locations_from_db(email):
 def extract_coordinates_from_data(data):
     coordinates = []
     for location in data:
-        coordinates.append([float(location[5]), float(location[6])])
-
+        coordinates.append([float(location[5]), float(location[6]), location[7], location[2]])
     return coordinates
 
 

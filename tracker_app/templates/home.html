@@ -7,9 +7,19 @@
         <script>
             var map;
             var coordinates = [];
+            var colors = [];
+            var names = [];
 
             function addCoordinates(lat, lng){
                 coordinates.push([lat, lng]);
+            }
+
+            function addColor(color){
+                colors.push(color);
+            }
+
+            function addName(name){
+                names.push(name);
             }
 
             function initMap(){
@@ -18,17 +28,21 @@
                     zoom: 2
                 });
 
-                function addMarker(location) {
+                function addMarker(location, color, name) {
+                    var url = "http://maps.google.com/mapfiles/ms/icons/" + color + "-dot.png";
                     var marker = new google.maps.Marker({
                     position: location,
-                    map: map
+                    map: map,
+                    icon: url,
+                    title: name
                     });
                 }
 
                 for(var i=0; i < coordinates.length; i++)
                 {
-                    addMarker({lat: coordinates[i][0], lng: coordinates[i][1]});
+                    addMarker({lat: coordinates[i][0], lng: coordinates[i][1]}, colors[i], names[i]);
                 }
+
         }
 
 
@@ -37,6 +51,8 @@
         {% for location in coordinates %}
             <script type="text/javascript">
                 addCoordinates({{ location[0] }}, {{ location[1] }});
+                addColor("{{ location[2] }}");
+                addName("{{ location[3] }}");
             </script>
         {% endfor %}
     {% endif %}
