@@ -7,7 +7,7 @@ import google.oauth2.credentials
 import googleapiclient.discovery
 from tracker_app.user_manager import check_if_user_exists, create_user, get_user_data, change_name
 from tracker_app.forms import UpdateUserSettings, NewLocation
-from tracker_app.location_manager import get_address_from_coordinates, add_location_to_db, get_locations_from_db, \
+from tracker_app.location_manager import get_country_from_coordinates, add_location_to_db, get_locations_from_db, \
     extract_coordinates_from_data, delete_location_from_db, check_id_belongs_to_user
 
 
@@ -80,19 +80,30 @@ def add_location():
     return redirect(url_for("tracker.home"))
 
 
-@tracker.route("/locations/confirm/<lat>/<lng>", methods=["GET", "POST"])
-def confirm_add_location(lat, lng):
+@tracker.route("/locations/confirm", methods=["GET", "POST"])
+def confirm_add_location():
+    lat = request.args.get('lat')
+    lng = request.args.get('lng')
+
+    if not lat or not lng:
+        flash("Sorry. We couldn't reach that location.")
+        return redirect(url_for("tracker.locations"))
+
     if is_logged_in():
         user_info = get_user_info()
         if check_if_user_exists(user_info['email']):
+            country = get_country_from_coordinates(lat, lng)
+            if not country:
+                return redirect(url_for("tracker.locations"))
+
             form = NewLocation()
-            address = get_address_from_coordinates(lat, lng)
             if form.validate_on_submit():
-                add_location_to_db(user_info['email'], form.name.data, address, form.description.data,
+                add_location_to_db(user_info['email'], form.name.data, country, form.description.data,
                                    lat, lng, form.pin_color.data)
                 return redirect(url_for("tracker.locations"))
+
             return render_template("confirm_location.html", title="Confirm Location", logged_in=True,
-                                   address=address, form=form)
+                                   country=country, form=form)
 
     flash("Unable to access the location page without being logged in!", "danger")
     return redirect(url_for("tracker.home"))

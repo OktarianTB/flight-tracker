@@ -18,7 +18,8 @@
               google.maps.event.addListener(map, 'click', function(event) {
                 addMarker(event.latLng, map);
 
-                window.location.replace("http://127.0.0.1:5000/locations/confirm/"+ event.latLng.lat() + "/" +event.latLng.lng());
+
+                window.location.replace("http://127.0.0.1:5000/locations/confirm?lat="+ event.latLng.lat() + "&lng=" +event.latLng.lng());
               });
 
           }
@@ -32,6 +33,7 @@
         }
 
         google.maps.event.addDomListener(window, 'load', initMap);
+
         </script>
 
 {% endblock content %}

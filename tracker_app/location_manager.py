@@ -1,5 +1,5 @@
 import requests
-from flask import redirect, url_for, flash
+from flask import flash
 import mysql.connector
 from tracker_app.config import Config
 
@@ -10,26 +10,33 @@ my_db = mysql.connector.connect(
     database="travel_tracker")
 
 
-def get_address_from_coordinates(lat, lng):
+def get_country_from_coordinates(lat, lng):
     url = "https://maps.googleapis.com/maps/api/geocode/json?"
     r = requests.get(url + f"latlng={lat},{lng}&key=" + Config.API_KEY)
     data = r.json()
+
     if r.status_code == 200:
-        return data['results'][0]['formatted_address']
+        try:
+            for component in data['results'][0]["address_components"]:
+                if "country" in component["types"]:
+                    return component["long_name"]
+        except IndexError:
+            pass
+
     flash("Unable to access that specific location.", "danger")
-    return redirect(url_for("tracker.home"))
+    return None
 
 
-def add_location_to_db(email, name, address, description, lat, lng, pin_color):
+def add_location_to_db(email, name, country, description, lat, lng, pin_color):
     cursor = my_db.cursor()
     if len(description) == 0:
-        data = (email, name, address[:200], lat, lng, pin_color)
-        sql = f"INSERT INTO locations (user_email, name, address, lat, lng, color) VALUES (%s, %s, " \
+        data = (email, name, country[:200], lat, lng, pin_color)
+        sql = f"INSERT INTO locations (user_email, name, country, lat, lng, color) VALUES (%s, %s, " \
               f"%s, %s, %s, %s)"
         cursor.execute(sql, data)
     else:
-        data = (email, name, address[:200], description[:200], lat, lng, pin_color)
-        sql = f"INSERT INTO locations (user_email, name, address, description, lat, lng, color) VALUES (%s, %s, " \
+        data = (email, name, country[:200], description[:200], lat, lng, pin_color)
+        sql = f"INSERT INTO locations (user_email, name, country, description, lat, lng, color) VALUES (%s, %s, " \
               f"%s, %s, %s, %s, %s)"
         cursor.execute(sql, data)
     my_db.commit()

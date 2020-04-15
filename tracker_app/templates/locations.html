@@ -32,7 +32,7 @@
                   <th>#</th>
                   <th scope="col">Name</th>
                   <th scope="col">Description</th>
-                  <th scope="col">Address</th>
+                  <th scope="col">Country</th>
                   <th scope="col">Remove</th>
                 </tr>
             </thead>
@@ -42,7 +42,7 @@
                         <th scope="row">{{ loop.index }}</th>
                         <th>{{ location[2] }}</th>
                         <th>{{ location[3] }}</th>
-                        <th>{{ location[4][:30] }}...</th>
+                        <th>{{ location[4] }}</th>
                         <th><a href="{{ url_for("tracker.delete_location", location_id=location[0]) }}">Delete</a></th>
                     </tr>
                 {% endfor %}
@@ -50,6 +50,6 @@
         </table>
         </div>
     {% endif %}
-
+    <br><br><br><br><br>
 {% endblock content %}
 {% include "footer.html" %}
