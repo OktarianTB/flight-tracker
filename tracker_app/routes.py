@@ -120,6 +120,30 @@ def delete_location(location_id):
     return redirect(url_for("tracker.locations"))
 
 
+@tracker.route("/flights", methods=["GET", "POST"])
+def flights():
+    if is_logged_in():
+        user_info = get_user_info()
+
+        if check_if_user_exists(user_info['email']):
+            return render_template("flights.html", title="Locations", logged_in=True,
+                                   number_of_flights=0)
+
+    flash("Unable to access the flights page without being logged in!", "danger")
+    return redirect(url_for("tracker.home"))
+
+
+@tracker.route("/flights/add", methods=["GET", "POST"])
+def add_flight():
+    if is_logged_in():
+        user_info = get_user_info()
+        if check_if_user_exists(user_info['email']):
+            return render_template("add_flight.html", title="Confirm Location", logged_in=True, api_key=Config.API_KEY)
+
+    flash("Unable to access the flights page without being logged in!", "danger")
+    return redirect(url_for("tracker.home"))
+
+
 def is_logged_in():
     return True if Config.AUTH_TOKEN_KEY in flask.session else False
 

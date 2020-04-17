@@ -2,6 +2,7 @@ import requests
 from flask import flash
 import mysql.connector
 from tracker_app.config import Config
+from time import sleep
 
 my_db = mysql.connector.connect(
     host="localhost",
@@ -40,6 +41,7 @@ def add_location_to_db(email, name, country, description, lat, lng, pin_color):
               f"%s, %s, %s, %s, %s)"
         cursor.execute(sql, data)
     my_db.commit()
+
 
 
 def get_locations_from_db(email):

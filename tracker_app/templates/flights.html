@@ -1,0 +1,31 @@
+{% include "header.html" %}
+{% block content %}
+
+    <main role="main" class="container text-center">
+        <br><br>
+        <h3>Your Flights:</h3>
+        <br>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="content-section">
+                    {% if number_of_locations == 1 %}
+                        <p>You currently have 1 flight added.</p><br>
+                    {% else %}
+                        <p>You currently have {{ number_of_flights }} flights added.</p><br>
+                    {% endif %}
+
+                    <br>
+                    <a href="{{ url_for('tracker.add_flight') }}">
+                    <button type="submit" class="btn btn-primary">
+                        Add a Flight
+                    </button> </a>
+                    <br><br><br><br>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <br><br><br><br><br>
+{% endblock content %}
+{% include "footer.html" %}

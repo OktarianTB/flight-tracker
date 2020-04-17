@@ -1,0 +1,69 @@
+{% include "header.html" %}
+{% block content %}
+    <br>
+    <div class="row justify-content-center">
+        <h3>Search the airport you flew from, then the airport you flew to:</h3>
+    </div>
+    <br>
+
+    <div id="map"></div>
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+
+    <script>
+
+        var map;
+        var infowindow;
+
+        function initMap() {
+            infowindow = new google.maps.InfoWindow();
+
+            map = new google.maps.Map(
+                document.getElementById('map'), {
+                    center: {lat: 40, lng: 0},
+                    zoom: 2
+                });
+
+            var input = document.getElementById('pac-input');
+            var searchBox = new google.maps.places.SearchBox(input);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+            map.addListener('bounds_changed', function () {
+                searchBox.setBounds(map.getBounds());
+            });
+
+
+            var markers = [];
+
+            searchBox.addListener('places_changed', function () {
+                var places = searchBox.getPlaces();
+
+                if (places.length == 0) {
+                    return;
+                }
+
+
+                places.forEach(function (place) {
+                    if (!place.geometry) {
+                        console.log("Returned place contains no geometry");
+                        return;
+                    }
+
+                    // Create a marker for each place.
+                    markers.push(new google.maps.Marker({
+                        map: map,
+                        icon: "http://maps.google.com/mapfiles/kml/pal2/icon48.png",
+                        title: place.name,
+                        position: place.geometry.location
+                    }));
+
+                });
+                document.getElementById('pac-input').value = '';
+            });
+
+        }
+
+    </script>
+
+
+{% endblock content %}
+{% include "footer.html" %}
