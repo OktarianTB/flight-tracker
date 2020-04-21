@@ -6,9 +6,9 @@ from authlib.integrations.requests_client import OAuth2Session
 import google.oauth2.credentials
 import googleapiclient.discovery
 from tracker_app.user_manager import check_if_user_exists, create_user, get_user_data, change_name
-from tracker_app.forms import UpdateUserSettings, NewLocation
+from tracker_app.forms import UpdateUserSettings, NewLocation, NewFlight
 from tracker_app.location_manager import get_country_from_coordinates, add_location_to_db, get_locations_from_db, \
-    extract_coordinates_from_data, delete_location_from_db, check_id_belongs_to_user
+    extract_coordinates_from_data, delete_location_from_db, check_id_belongs_to_user, get_location_from_coordinates
 
 
 tracker = Blueprint("tracker", __name__)
@@ -126,7 +126,7 @@ def flights():
         user_info = get_user_info()
 
         if check_if_user_exists(user_info['email']):
-            return render_template("flights.html", title="Locations", logged_in=True,
+            return render_template("flights.html", title="Flights", logged_in=True,
                                    number_of_flights=0)
 
     flash("Unable to access the flights page without being logged in!", "danger")
@@ -138,7 +138,39 @@ def add_flight():
     if is_logged_in():
         user_info = get_user_info()
         if check_if_user_exists(user_info['email']):
-            return render_template("add_flight.html", title="Confirm Location", logged_in=True, api_key=Config.API_KEY)
+            return render_template("add_flight.html", title="Add Flight", logged_in=True, api_key=Config.API_KEY)
+
+    flash("Unable to access the flights page without being logged in!", "danger")
+    return redirect(url_for("tracker.home"))
+
+
+@tracker.route("/flights/confirm", methods=["GET", "POST"])
+def confirm_flight():
+    lat1 = request.args.get('lat1')
+    lng1 = request.args.get('lng1')
+    lat2 = request.args.get('lat2')
+    lng2 = request.args.get('lng2')
+
+    if not lat1 or not lng1 or not lat2 or not lng2:
+        flash("Sorry. We couldn't log that flight.")
+        return redirect(url_for("tracker.flights"))
+
+    if is_logged_in():
+        user_info = get_user_info()
+        if check_if_user_exists(user_info['email']):
+            loc1 = get_location_from_coordinates(lat1, lng1)
+            loc2 = get_location_from_coordinates(lat2, lng2)
+
+            if not loc1 or not loc2:
+                flash("Unable to access that specific location.", "danger")
+                return redirect(url_for("tracker.flights"))
+
+            form = NewFlight()
+            if form.validate_on_submit():
+                return redirect(url_for("tracker.flights"))
+
+            return render_template("confirm_flight.html", title="Confirm Flight", logged_in=True, form=form, loc1=loc1,
+                                   loc2=loc2)
 
     flash("Unable to access the flights page without being logged in!", "danger")
     return redirect(url_for("tracker.home"))

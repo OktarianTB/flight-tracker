@@ -15,3 +15,9 @@ class NewLocation(FlaskForm):
                             choices=[("red", "Red"), ("blue", "Blue"), ("green", "Green"), ("yellow", "Yellow"),
                                      ("pink", "Pink"), ("orange", "Orange"), ("purple", "Purple")])
     submit = SubmitField("Add Location")
+
+
+class NewFlight(FlaskForm):
+    flight_name = StringField("Flight Name", validators=[DataRequired(), Length(min=2, max=40)])
+    submit = SubmitField("Add Flight")
+

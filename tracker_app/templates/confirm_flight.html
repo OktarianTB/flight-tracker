@@ -1,0 +1,60 @@
+{% include "header.html" %}
+{% block content %}
+
+    <main role="main" class="container text-center">
+        <br><br>
+        <h3>Do you want to add this flight to your list?</h3><br>
+        <a href="{{ url_for('tracker.add_flight') }}">
+            <button type="submit" class="btn btn-primary">
+                Cancel
+            </button>
+        </a>
+        <br><br>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="content-section">
+
+                    <div class="form-group">
+                        <label for="exampleFormControlInput1">Start Location</label>
+                        <input type="email" class="form-control" id="exampleFormControlInput1"
+                               placeholder="{{ loc1 }}"
+                               readonly>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="exampleFormControlInput1">End Location</label>
+                        <input type="email" class="form-control" id="exampleFormControlInput1"
+                               placeholder="{{ loc2 }}"
+                               readonly>
+                    </div>
+                    <br>
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        <fieldset class="form-group">
+                            <div class="form-group">
+                                {{ form.flight_name.label(class="form-control-label") }}
+                                {% if form.flight_name.errors %}}
+                                    {{ form.flight_name(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.flight_name.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.flight_name(class="form-control form-control-lg") }}
+                                {% endif %}
+                            </div>
+                        </fieldset>
+                        <div class="form-group">
+                            {{ form.submit(class="btn btn-primary mb-2") }}
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </main>
+    <br><br><br><br><br><br><br>
+{% endblock content %}
+{% include "footer.html" %}

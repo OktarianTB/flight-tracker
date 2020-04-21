@@ -18,13 +18,32 @@ def get_country_from_coordinates(lat, lng):
 
     if r.status_code == 200:
         try:
-            for component in data['results'][0]["address_components"]:
+            for component in data["results"][0]["address_components"]:
                 if "country" in component["types"]:
                     return component["long_name"]
         except IndexError:
             pass
 
     flash("Unable to access that specific location.", "danger")
+    return None
+
+
+def get_location_from_coordinates(lat, lng):
+    url = "https://maps.googleapis.com/maps/api/geocode/json?"
+    r = requests.get(url + f"latlng={lat},{lng}&key=" + Config.API_KEY)
+    data = r.json()
+
+    if r.status_code == 200:
+        try:
+            print(data)
+            if "airport" in data["results"][0]["address_components"][0]["types"]:
+                location = data["results"][0]["address_components"][0]["long_name"]
+            else:
+                location = data["results"][1]["address_components"][0]["long_name"]
+            return location
+        except IndexError:
+            pass
+
     return None
 
 
@@ -41,7 +60,6 @@ def add_location_to_db(email, name, country, description, lat, lng, pin_color):
               f"%s, %s, %s, %s, %s)"
         cursor.execute(sql, data)
     my_db.commit()
-
 
 
 def get_locations_from_db(email):

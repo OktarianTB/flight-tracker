@@ -33,6 +33,7 @@
 
 
             var markers = [];
+            var coordinates = [];
 
             searchBox.addListener('places_changed', function () {
                 var places = searchBox.getPlaces();
@@ -56,8 +57,14 @@
                         position: place.geometry.location
                     }));
 
+                    coordinates.push([place.geometry.location.lat(), place.geometry.location.lng()])
                 });
                 document.getElementById('pac-input').value = '';
+
+                if(coordinates.length >= 2){
+                    window.location.replace("http://127.0.0.1:5000/flights/confirm?lat1="+ coordinates[0][0] +
+                        "&lng1=" + coordinates[0][1] + "&lat2=" + coordinates[1][0] + "&lng2=" + coordinates[1][1]);
+                }
             });
 
         }
