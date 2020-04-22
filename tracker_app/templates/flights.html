@@ -8,23 +8,49 @@
         <div class="row justify-content-center">
             <div class="col-lg-6">
                 <div class="content-section">
-                    {% if number_of_locations == 1 %}
+                    {% if number_of_flights == 1 %}
                         <p>You currently have 1 flight added.</p><br>
                     {% else %}
                         <p>You currently have {{ number_of_flights }} flights added.</p><br>
                     {% endif %}
-
                     <br>
                     <a href="{{ url_for('tracker.add_flight') }}">
-                    <button type="submit" class="btn btn-primary">
-                        Add a Flight
-                    </button> </a>
+                        <button type="submit" class="btn btn-primary">
+                            Add a Flight
+                        </button>
+                    </a>
                     <br><br><br><br>
 
                 </div>
             </div>
         </div>
     </main>
+    {% if number_of_flights > 0 %}
+        <div class="container">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th scope="col">Flight Name</th>
+                    <th scope="col">Start</th>
+                    <th scope="col">End</th>
+                    <th scope="col">Remove</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for location in data %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <th>{{ location[2] }}</th>
+                        <th>{{ location[3] }}</th>
+                        <th>{{ location[6] }}</th>
+                        <th><a href="">Delete</a></th>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 
     <br><br><br><br><br>
 {% endblock content %}

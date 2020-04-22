@@ -10,19 +10,30 @@
             var colors = [];
             var names = [];
 
-            function addCoordinates(lat, lng){
+            var flight_coordinates = [];
+            var flight_names = [];
+
+            function addCoordinates(lat, lng) {
                 coordinates.push([lat, lng]);
             }
 
-            function addColor(color){
+            function addColor(color) {
                 colors.push(color);
             }
 
-            function addName(name){
+            function addName(name) {
                 names.push(name);
             }
 
-            function initMap(){
+            function addFlight(lat1, lng1, lat2, lng2) {
+                flight_coordinates.push([{lat: lat1, lng: lng1}, {lat: lat2, lng: lng2}]);
+            }
+
+            function addFlightName(name) {
+                flight_names.push(name);
+            }
+
+            function initMap() {
                 map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat: 40, lng: 0},
                     zoom: 2
@@ -31,30 +42,66 @@
                 function addMarker(location, color, name) {
                     var url = "http://maps.google.com/mapfiles/ms/icons/" + color + "-dot.png";
                     var marker = new google.maps.Marker({
-                    position: location,
-                    map: map,
-                    icon: url,
-                    title: name
+                        position: location,
+                        map: map,
+                        icon: url,
+                        title: name
                     });
                 }
 
-                for(var i=0; i < coordinates.length; i++)
-                {
+                function addFlightMarkers(location1, location2, name) {
+                    var flightPath = new google.maps.Polyline({
+                        path: [location1, location2],
+                        geodesic: true,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
+                    });
+                    flightPath.setMap(map);
+
+                    var marker = new google.maps.Marker({
+                        position: location1,
+                        map: map,
+                        title: name,
+                        icon: "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
+                    });
+                    var marker = new google.maps.Marker({
+                        position: location2,
+                        map: map,
+                        title: name,
+                        icon: "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
+                    });
+                }
+
+                for (var i = 0; i < coordinates.length; i++) {
                     addMarker({lat: coordinates[i][0], lng: coordinates[i][1]}, colors[i], names[i]);
                 }
 
-        }
+                for (var i = 0; i < flight_coordinates.length; i++) {
+                    addFlightMarkers(flight_coordinates[i][0], flight_coordinates[i][1], flight_names[i]);
+                }
+
+
+            }
 
 
         </script>
 
-        {% for location in coordinates %}
+        {% for location in location_info %}
             <script type="text/javascript">
                 addCoordinates({{ location[0] }}, {{ location[1] }});
                 addColor("{{ location[2] }}");
                 addName("{{ location[3] }}");
             </script>
         {% endfor %}
+
+        {% for flight in flight_info %}
+            <script type="text/javascript">
+                addFlight({{ flight[1] }}, {{ flight[2] }}, {{ flight[3] }}, {{ flight[4] }});
+                addFlightName("{{ flight[0] }}");
+            </script>
+        {% endfor %}
+
     {% endif %}
 
 

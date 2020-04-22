@@ -8,7 +8,8 @@ import googleapiclient.discovery
 from tracker_app.user_manager import check_if_user_exists, create_user, get_user_data, change_name
 from tracker_app.forms import UpdateUserSettings, NewLocation, NewFlight
 from tracker_app.location_manager import get_country_from_coordinates, add_location_to_db, get_locations_from_db, \
-    extract_coordinates_from_data, delete_location_from_db, check_id_belongs_to_user, get_location_from_coordinates
+    get_location_coordinates, delete_location_from_db, check_id_belongs_to_user, get_location_from_coordinates, \
+    add_flight_to_db, get_flights_from_db, get_flight_coordinates
 
 
 tracker = Blueprint("tracker", __name__)
@@ -21,10 +22,11 @@ def home():
         if check_if_user_exists(user_info['email']) is False:
             create_user(user_info['email'], user_info['given_name'])
 
-        data = get_locations_from_db(user_info['email'])
-        coordinates = extract_coordinates_from_data(data)
-        return render_template("home.html", title="Home", api_key=Config.API_KEY, coordinates=coordinates,
-                               name=user_info['given_name'], email=user_info['email'], logged_in=True)
+        location_info = get_location_coordinates(user_info['email'])
+        flight_info = get_flight_coordinates(user_info['email'])
+        return render_template("home.html", title="Home", api_key=Config.API_KEY, location_info=location_info,
+                               flight_info=flight_info, name=user_info['given_name'],
+                               email=user_info['email'], logged_in=True)
 
     flash("You need to login!", "info")
     return render_template("home.html", title="Home", logged_in=False)
@@ -126,8 +128,10 @@ def flights():
         user_info = get_user_info()
 
         if check_if_user_exists(user_info['email']):
+            data = get_flights_from_db(user_info['email'])
+            number_of_flights = len(data)
             return render_template("flights.html", title="Flights", logged_in=True,
-                                   number_of_flights=0)
+                                   data=data, number_of_flights=number_of_flights)
 
     flash("Unable to access the flights page without being logged in!", "danger")
     return redirect(url_for("tracker.home"))
@@ -167,6 +171,7 @@ def confirm_flight():
 
             form = NewFlight()
             if form.validate_on_submit():
+                add_flight_to_db(user_info['email'], form.flight_name.data, loc1, lat1, lng1, loc2, lat2, lng2)
                 return redirect(url_for("tracker.flights"))
 
             return render_template("confirm_flight.html", title="Confirm Flight", logged_in=True, form=form, loc1=loc1,

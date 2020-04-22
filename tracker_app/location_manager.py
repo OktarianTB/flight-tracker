@@ -35,12 +35,13 @@ def get_location_from_coordinates(lat, lng):
 
     if r.status_code == 200:
         try:
-            print(data)
             if "airport" in data["results"][0]["address_components"][0]["types"]:
                 location = data["results"][0]["address_components"][0]["long_name"]
-            else:
+            elif data["results"][1]["address_components"][0]["types"]:
                 location = data["results"][1]["address_components"][0]["long_name"]
-            return location
+            else:
+                return None
+            return location[:250]
         except IndexError:
             pass
 
@@ -62,6 +63,15 @@ def add_location_to_db(email, name, country, description, lat, lng, pin_color):
     my_db.commit()
 
 
+def add_flight_to_db(email, flight_name, start_name, start_lat, start_lng, end_name, end_lat, end_lng):
+    cursor = my_db.cursor()
+    data = (email, flight_name, start_name, start_lat, start_lng, end_name, end_lat, end_lng)
+    sql = f"INSERT INTO flights (user_email, flight_name, start_name, start_lat, start_lng, end_name, end_lat, " \
+          f"end_lng) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+    cursor.execute(sql, data)
+    my_db.commit()
+
+
 def get_locations_from_db(email):
     cursor = my_db.cursor()
     data = (email, )
@@ -71,7 +81,25 @@ def get_locations_from_db(email):
     return result
 
 
-def extract_coordinates_from_data(data):
+def get_flights_from_db(email):
+    cursor = my_db.cursor()
+    data = (email, )
+    sql = f"SELECT * FROM flights WHERE user_email=%s"
+    cursor.execute(sql, data)
+    result = cursor.fetchall()
+    return result
+
+
+def get_flight_coordinates(email):
+    flight_info = []
+    flights = get_flights_from_db(email)
+    for flight in flights:
+        flight_info.append([flight[2], float(flight[4]), float(flight[5]), float(flight[7]), float(flight[8])])
+    return flight_info
+
+
+def get_location_coordinates(email):
+    data = get_locations_from_db(email)
     coordinates = []
     for location in data:
         coordinates.append([float(location[5]), float(location[6]), location[7], location[2]])
