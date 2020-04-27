@@ -38,13 +38,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for location in data %}
+                {% for flight in data %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
-                        <th>{{ location[2] }}</th>
-                        <th>{{ location[3] }}</th>
-                        <th>{{ location[6] }}</th>
-                        <th><a href="">Delete</a></th>
+                        <th>{{ flight[2] }}</th>
+                        <th>{{ flight[3] }}</th>
+                        <th>{{ flight[6] }}</th>
+                        <th><a href="{{ url_for("tracker.delete_flight", flight_id=flight[0]) }}">Delete</a></th>
                     </tr>
                 {% endfor %}
                 </tbody>

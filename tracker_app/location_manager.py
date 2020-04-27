@@ -114,10 +114,29 @@ def delete_location_from_db(location_id):
     my_db.commit()
 
 
-def check_id_belongs_to_user(email, location_id):
+def delete_flight_from_db(flight_id):
+    cursor = my_db.cursor()
+    data = (flight_id, )
+    sql = f"DELETE FROM flights WHERE id=%s"
+    cursor.execute(sql, data)
+    my_db.commit()
+
+
+def check_location_id_belongs_to_user(email, location_id):
     cursor = my_db.cursor()
     data = (email, location_id)
     sql = f"SELECT * FROM locations WHERE user_email=%s AND id=%s"
+    cursor.execute(sql, data)
+    result = cursor.fetchall()
+    if len(result) == 0:
+        return False
+    return True
+
+
+def check_flight_id_belongs_to_user(email, flight_id):
+    cursor = my_db.cursor()
+    data = (email, flight_id)
+    sql = f"SELECT * FROM flights WHERE user_email=%s AND id=%s"
     cursor.execute(sql, data)
     result = cursor.fetchall()
     if len(result) == 0:

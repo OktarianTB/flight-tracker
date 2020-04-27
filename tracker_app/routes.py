@@ -8,8 +8,9 @@ import googleapiclient.discovery
 from tracker_app.user_manager import check_if_user_exists, create_user, get_user_data, change_name
 from tracker_app.forms import UpdateUserSettings, NewLocation, NewFlight
 from tracker_app.location_manager import get_country_from_coordinates, add_location_to_db, get_locations_from_db, \
-    get_location_coordinates, delete_location_from_db, check_id_belongs_to_user, get_location_from_coordinates, \
-    add_flight_to_db, get_flights_from_db, get_flight_coordinates
+    get_location_coordinates, delete_location_from_db, check_location_id_belongs_to_user, get_location_from_coordinates, \
+    add_flight_to_db, get_flights_from_db, get_flight_coordinates, \
+    check_flight_id_belongs_to_user, delete_flight_from_db
 
 
 tracker = Blueprint("tracker", __name__)
@@ -115,7 +116,7 @@ def confirm_add_location():
 def delete_location(location_id):
     if is_logged_in():
         user_info = get_user_info()
-        if check_id_belongs_to_user(user_info['email'], location_id):
+        if check_location_id_belongs_to_user(user_info['email'], location_id):
             delete_location_from_db(location_id)
         else:
             flash("This location's ID is invalid.", "danger")
@@ -179,6 +180,17 @@ def confirm_flight():
 
     flash("Unable to access the flights page without being logged in!", "danger")
     return redirect(url_for("tracker.home"))
+
+
+@tracker.route("/flights/delete/<flight_id>", methods=["GET", "POST"])
+def delete_flight(flight_id):
+    if is_logged_in():
+        user_info = get_user_info()
+        if check_flight_id_belongs_to_user(user_info['email'], flight_id):
+            delete_flight_from_db(flight_id)
+        else:
+            flash("This flight ID is invalid.", "danger")
+    return redirect(url_for("tracker.flights"))
 
 
 def is_logged_in():
